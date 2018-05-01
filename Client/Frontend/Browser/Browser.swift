@@ -156,7 +156,7 @@ class Browser: NSObject, BrowserWebViewDelegate {
         }
         
         guard let callback = callback else { return }
-        if let tab = TabMO.getByID(tabID), let url = tab.imageUrl {
+        if let tab = TabMO.get(byId: tabID, context: .workerThreadContext), let url = tab.imageUrl {
             weak var weakSelf = self
             ImageCache.shared.image(url, type: .portrait, callback: { (image) in
                 if let image = image {
@@ -365,12 +365,17 @@ class Browser: NSObject, BrowserWebViewDelegate {
     var title: String? {
         return webView?.title
     }
+    
+    var isHomePanel: Bool {
+        guard let url = webView?.URL else { return false }
+        return url.baseDomain == "localhost" && url.absoluteString.contains("about/home/#panel=0")
+    }
 
     var displayTitle: String {
         if let title = webView?.title, !title.isEmpty {
             return title.range(of: "localhost") == nil ? title : ""
         }
-        else if let url = webView?.URL, url.baseDomain == "localhost", url.absoluteString.contains("about/home/#panel=0") {
+        else if isHomePanel {
             return Strings.New_Tab
         }
 
@@ -378,7 +383,7 @@ class Browser: NSObject, BrowserWebViewDelegate {
             if let title = displayURL?.absoluteString {
                 return title
             }
-            else if let tab = TabMO.getByID(tabID) {
+            else if let tab = TabMO.get(byId: tabID, context: .mainThreadContext) {
                 return tab.title ?? tab.url ?? ""
             }
             return ""
@@ -587,7 +592,7 @@ class Browser: NSObject, BrowserWebViewDelegate {
             screenshotUUID = UUID()
         }
         
-        if let tab = TabMO.getByID(tabID), let url = tab.imageUrl {
+        if let tab = TabMO.get(byId: tabID, context: .workerThreadContext), let url = tab.imageUrl {
             if !PrivateBrowsing.singleton.isOn {
                 ImageCache.shared.cache(screenshot, url: url, type: .portrait, callback: {
                     debugPrint("Cached screenshot.")
