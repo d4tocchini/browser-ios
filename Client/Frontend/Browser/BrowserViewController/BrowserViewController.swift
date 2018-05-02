@@ -574,6 +574,7 @@ class BrowserViewController: UIViewController {
         let popup = AlertPopupView(image: UIImage(named: "browser_lock_popup"), title: Strings.Browser_lock_callout_title, message: Strings.Browser_lock_callout_message)
         popup.addButton(title: Strings.Browser_lock_callout_not_now) { () -> PopupViewDismissType in
             weakSelf?.profile.prefs.setBool(true, forKey: kPrefKeyPopupForBrowserLock)
+            weakSelf?.selectLocationBar()
             return .flyDown
         }
         popup.addDefaultButton(title: Strings.Browser_lock_callout_enable) { () -> PopupViewDismissType in

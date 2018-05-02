@@ -22,7 +22,12 @@ extension BraveBrowserToolbarButtonActions {
     
     func respondToNewPrivateTab(action: UIAlertAction) {
         getApp().browserViewController.switchBrowsingMode(toPrivate: true)
-        let app = UIApplication.shared.delegate as! AppDelegate
-        app.browserViewController.urlBar.browserLocationViewDidTapLocation(app.browserViewController.urlBar.locationView)
+        
+        if let profile = getApp().profile, profile.prefs.boolForKey(kPrefKeySetBrowserLock) == true || profile.prefs.boolForKey(kPrefKeyPopupForBrowserLock) == true {
+            postAsyncToMain(0.2) {
+                let app = UIApplication.shared.delegate as! AppDelegate
+                app.browserViewController.urlBar.browserLocationViewDidTapLocation(app.browserViewController.urlBar.locationView)
+            }
+        }
     }
 }

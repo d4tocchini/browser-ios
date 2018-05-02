@@ -39,8 +39,11 @@ extension BrowserViewController {
 
     func newPrivateTab() {
         openBlankNewTabAndFocus(isPrivate: true)
-        postAsyncToMain(0.2) {
-            self.selectLocationBar()
+        
+        if profile.prefs.boolForKey(kPrefKeySetBrowserLock) == true || profile.prefs.boolForKey(kPrefKeyPopupForBrowserLock) == true {
+            postAsyncToMain(0.2) {
+                self.selectLocationBar()
+            }
         }
     }
 
